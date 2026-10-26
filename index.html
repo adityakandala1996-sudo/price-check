@@ -4,126 +4,223 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Price Check</title>
-<meta name="theme-color" content="#0f766e">
+<meta name="theme-color" content="#f2f1ee" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#101014" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Price Check">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏷️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..800&family=Geist+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #f6f7f9; --card: #ffffff; --text: #16191d; --muted: #5d6670; --line: #e3e6ea;
-  --accent: #0f766e; --accent-ink: #ffffff; --accent-soft: #e2f3f1;
-  --warn: #9a5b00; --warn-soft: #fff4e0; --bad: #b42318; --bad-soft: #fdecea;
+  --bg: #f2f1ee; --card: #f2f1ee; --raised: #ffffff; --ink: #101014; --muted: rgba(16,16,20,.6); --faint: rgba(16,16,20,.42);
+  --line: #d6d4ce; --soft: #e9e7e2;
+  --accent: #101014; --accent-ink: #f2f1ee; --deal: #17703f; --deal-soft: #dcefe2;
+  --warn: #8a5300; --warn-soft: #f6e8cf; --bad: #b42318; --bad-soft: #f8e1de;
+  --display: "Archivo", system-ui, sans-serif; --mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --serif: "Instrument Serif", Georgia, serif;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #101317; --card: #1a1e24; --text: #eef1f4; --muted: #9aa4ae; --line: #2b3139;
-    --accent: #2dd4bf; --accent-ink: #062a26; --accent-soft: #123532;
-    --warn: #f5b546; --warn-soft: #3a2c10; --bad: #f97066; --bad-soft: #3d1a17;
+    --bg: #101014; --card: #101014; --raised: #18181d; --ink: #f2f1ee; --muted: rgba(242,241,238,.62); --faint: rgba(242,241,238,.42);
+    --line: #2b2b31; --soft: #1b1b20;
+    --accent: #f2f1ee; --accent-ink: #101014; --deal: #6fd49b; --deal-soft: #15301f;
+    --warn: #f0b15a; --warn-soft: #33270f; --bad: #f97066; --bad-soft: #3a1917;
   }
 }
-* { box-sizing: border-box; }
+* { box-sizing: border-box; border-radius: 0; }
 body {
-  margin: 0; background: var(--bg); color: var(--text);
-  font: 16px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  -webkit-text-size-adjust: 100%;
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 15px/1.55 "Inter", system-ui, -apple-system, sans-serif;
+  -webkit-text-size-adjust: 100%; -webkit-font-smoothing: antialiased;
 }
-main { max-width: 720px; margin: 0 auto; padding: 16px 16px calc(32px + env(safe-area-inset-bottom)); }
-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 4px 0 16px; }
-h1 { font-size: 1.4rem; margin: 0; }
-h1 small { display: block; font-size: .8rem; font-weight: 400; color: var(--muted); }
-button, input { font: inherit; }
-button {
-  border: 1px solid var(--line); background: var(--card); color: var(--text);
-  border-radius: 10px; padding: 8px 14px; cursor: pointer; min-height: 40px;
-}
-button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
-button:disabled { opacity: .55; cursor: default; }
-button.link { border: 0; background: none; color: var(--muted); padding: 8px; min-height: 0; }
-input {
-  width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px;
-  background: var(--card); color: var(--text); min-height: 44px;
-}
-label { display: block; font-size: .85rem; color: var(--muted); margin: 12px 0 4px; }
-.card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px; margin-bottom: 12px; }
-form.add { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
-form.add #newName { grid-column: 1 / -1; }
-.item-top { display: flex; align-items: center; gap: 8px; }
-.item-top .item-name { flex: 1; min-width: 0; }
-.meta { display: flex; flex-wrap: wrap; gap: 4px 10px; color: var(--muted); font-size: .82rem; margin-top: 2px; }
-.tokens { white-space: nowrap; }
-details.more { margin-top: 10px; border-top: 1px solid var(--line); padding-top: 6px; }
-details.more summary { cursor: pointer; color: var(--muted); font-size: .9rem; padding: 6px 0; list-style: none; }
-details.more summary::-webkit-details-marker { display: none; }
-details.more summary::before { content: '▸ '; }
-details.more[open] summary::before { content: '▾ '; }
-.link-row { display: flex; gap: 8px; align-items: center; font-size: .85rem; margin: 4px 0 6px; }
-.link-row a { color: var(--accent); word-break: break-all; flex: 1; min-width: 0; }
-.notice { padding: 12px 14px; border-radius: 12px; margin-bottom: 12px; font-size: .92rem; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; border: 0; background: none; }
+button:disabled { cursor: default; opacity: .55; }
+a { color: inherit; }
+.mono { font-family: var(--mono); font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; }
+
+/* Top bar */
+.bar-top { position: sticky; top: 0; z-index: 5; display: flex; align-items: stretch; height: calc(48px + env(safe-area-inset-top));
+  padding-top: env(safe-area-inset-top); background: var(--bg); border-bottom: 1px solid var(--line); }
+.bar-top .brand { display: flex; align-items: center; padding: 0 16px; border-right: 1px solid var(--line); }
+.bar-top .brand span { background: var(--ink); color: var(--bg); padding: 3px 7px; }
+.bar-top .grow { flex: 1; }
+.bar-top button { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border-left: 1px solid var(--line); }
+.bar-top button svg { width: 17px; height: 17px; }
+.bar-top .cta { background: var(--ink); color: var(--bg); border-left: 0; font-weight: 600; }
+
+main { max-width: 720px; margin: 0 auto; padding-bottom: calc(40px + env(safe-area-inset-bottom)); border-left: 1px solid var(--line); border-right: 1px solid var(--line); min-height: calc(100vh - 48px); }
+@media (max-width: 720px) { main { border-left: 0; border-right: 0; } }
+
+/* Hero */
+.hero { text-align: center; padding: 44px 16px 28px; border-bottom: 1px solid var(--line); }
+h1 { font-family: var(--display); font-stretch: 125%; font-weight: 800; text-transform: uppercase; letter-spacing: -.01em;
+  font-size: clamp(2.3rem, 11vw, 4.2rem); line-height: .95; margin: 0; }
+.hero .tag-line { font-family: var(--display); font-stretch: 112%; font-weight: 650; font-size: 1.3rem; margin: 14px 0 0; letter-spacing: -.01em; }
+.hero .tag-line em { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 1.15em; color: var(--muted); letter-spacing: 0; }
+.hero .meta { color: var(--faint); margin-top: 14px; line-height: 1.9; }
+
+/* Stats */
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--line); }
+.stat { padding: 14px 16px; min-width: 0; }
+.stat + .stat { border-left: 1px solid var(--line); }
+.stat b { display: block; font-family: var(--display); font-stretch: 112%; font-weight: 700; font-size: 1.35rem; letter-spacing: -.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stat span { color: var(--faint); }
+
+.notice { padding: 12px 16px; font-size: .88rem; border-bottom: 1px solid var(--line); }
 .notice.warn { background: var(--warn-soft); color: var(--warn); }
 .notice.bad { background: var(--bad-soft); color: var(--bad); }
-.item-head { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
-.item-name { font-weight: 600; word-break: break-word; }
-.sub { color: var(--muted); font-size: .85rem; }
-.best { margin-top: 10px; padding: 10px 12px; background: var(--accent-soft); border-radius: 10px; }
-.best b { font-size: 1.15rem; }
-.best a { color: var(--accent); font-weight: 600; }
-.actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
-.status { margin-top: 10px; font-size: .9rem; color: var(--muted); display: flex; align-items: center; gap: 8px; }
-.spin { width: 14px; height: 14px; border: 2px solid var(--line); border-top-color: var(--accent); border-radius: 50%; animation: s 1s linear infinite; }
-@keyframes s { to { transform: rotate(360deg); } }
-.err { margin-top: 10px; color: var(--bad); font-size: .9rem; }
-.offers { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: .9rem; }
-.offers th, .offers td { text-align: left; padding: 8px 6px; border-top: 1px solid var(--line); vertical-align: top; }
-.offers th { color: var(--muted); font-weight: 500; font-size: .8rem; }
-.offers td.n { text-align: right; white-space: nowrap; }
-.offers a { color: var(--accent); }
-.tag { display: inline-block; font-size: .72rem; padding: 1px 6px; border-radius: 6px; background: var(--warn-soft); color: var(--warn); margin-left: 4px; }
-.details h4 { margin: 14px 0 4px; font-size: .9rem; }
-.details ul { margin: 4px 0; padding-left: 20px; font-size: .9rem; }
-.details .src a { color: var(--muted); word-break: break-all; font-size: .8rem; }
-.empty { text-align: center; color: var(--muted); padding: 32px 16px; }
-dialog { border: 0; border-radius: 16px; padding: 18px; width: min(480px, calc(100vw - 32px)); background: var(--card); color: var(--text); }
-dialog::backdrop { background: rgba(0,0,0,.45); }
-dialog h2 { margin: 0 0 4px; font-size: 1.15rem; }
-dialog .help { font-size: .82rem; color: var(--muted); margin: 4px 0 0; }
-dialog .row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; }
-@media (max-width: 520px) {
-  .offers .hide-sm { display: none; }
-}
+
+/* Item */
+.card { border-bottom: 1px solid var(--line); background: var(--card); }
+.card-head { display: flex; justify-content: space-between; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--line); color: var(--faint); }
+.card-body { padding: 16px 16px 4px; }
+.row { display: flex; align-items: flex-start; gap: 14px; }
+.name { flex: 1; min-width: 0; font-family: var(--display); font-stretch: 110%; font-weight: 650; font-size: 1.2rem; line-height: 1.25; letter-spacing: -.01em;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.search-btn { flex: none; display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px;
+  background: var(--accent); color: var(--accent-ink); font-family: var(--mono); font-size: .7rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; }
+.search-btn svg { width: 14px; height: 14px; }
+.search-btn.busy svg { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.price { margin-top: 16px; display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 12px; }
+.price .amt { font-family: var(--display); font-stretch: 115%; font-weight: 800; font-size: 2.3rem; letter-spacing: -.03em; line-height: 1; }
+.price .at { font-family: var(--serif); font-style: italic; font-size: 1.25rem; color: var(--muted); }
+.price .at a, .price .at b { font-family: "Inter", sans-serif; font-style: normal; font-size: .95rem; font-weight: 600; color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--ink); }
+.save { font-family: var(--mono); font-size: .66rem; letter-spacing: .1em; text-transform: uppercase; background: var(--deal-soft); color: var(--deal); padding: 4px 8px; font-weight: 500; }
+.why { color: var(--muted); font-size: .88rem; margin-top: 8px;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.placeholder { margin-top: 12px; color: var(--muted); font-size: .9rem; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); padding: 5px 9px; color: var(--muted); white-space: nowrap;
+  font-family: var(--mono); font-size: .64rem; letter-spacing: .1em; text-transform: uppercase; }
+.chip.tok { color: var(--ink); border-color: var(--ink); }
+.chip svg { width: 11px; height: 11px; }
+
+.status { margin-top: 14px; display: flex; gap: 10px; align-items: center; font-size: .85rem; color: var(--muted); border: 1px dashed var(--line); padding: 10px 12px; }
+.bar { flex: none; width: 14px; height: 14px; border: 2px solid var(--line); border-top-color: var(--ink); border-radius: 50%; animation: spin 1s linear infinite; }
+.err { margin-top: 14px; background: var(--bad-soft); color: var(--bad); font-size: .85rem; padding: 10px 12px; }
+
+details.more { margin: 14px -16px 0; border-top: 1px solid var(--line); }
+details.more summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; color: var(--muted); }
+details.more summary::-webkit-details-marker { display: none; }
+details.more summary svg { width: 14px; height: 14px; transition: transform .2s; }
+details.more[open] summary { border-bottom: 1px solid var(--line); }
+details.more[open] summary svg { transform: rotate(180deg); }
+.panel { padding: 14px 16px 16px; }
+.link-box { display: flex; align-items: stretch; border: 1px solid var(--line); font-size: .82rem; }
+.link-box a, .link-box .none { flex: 1; min-width: 0; padding: 10px 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.link-box a { font-weight: 500; }
+.link-box .none { color: var(--faint); }
+.mini { border-left: 1px solid var(--line); padding: 0 12px; color: var(--muted); font-family: var(--mono); font-size: .64rem; letter-spacing: .1em; text-transform: uppercase; }
+.mini.danger { color: var(--bad); }
+.matched { font-size: .84rem; color: var(--muted); margin: 12px 0 0; }
+h4 { font-family: var(--mono); font-size: .66rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--faint); margin: 20px 0 4px; }
+.offer { display: flex; gap: 14px; padding: 12px 0; border-top: 1px solid var(--line); }
+.offer:first-of-type { border-top: 0; }
+.offer .who { flex: 1; min-width: 0; }
+.offer .who a, .offer .who b { font-weight: 600; text-decoration: none; }
+.offer .who a:hover { text-decoration: underline; }
+.offer .note { font-size: .8rem; color: var(--muted); margin-top: 2px; }
+.offer .amt { font-family: var(--display); font-stretch: 110%; font-weight: 700; font-size: 1.05rem; white-space: nowrap; }
+.offer.best .amt { color: var(--deal); }
+.tag { display: inline-block; font-family: var(--mono); font-size: .58rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase;
+  padding: 2px 6px; margin-left: 6px; vertical-align: 2px; background: var(--warn-soft); color: var(--warn); }
+.tag.good { background: var(--deal-soft); color: var(--deal); }
+ul.tips { margin: 0; padding-left: 18px; font-size: .86rem; }
+ul.tips li { margin: 5px 0; }
+.sources { display: flex; flex-wrap: wrap; gap: 6px; }
+.sources a { font-family: var(--mono); font-size: .66rem; color: var(--muted); border: 1px solid var(--line); padding: 4px 8px; text-decoration: none; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.usage { font-size: .8rem; color: var(--muted); margin-top: 18px; padding: 12px; border: 1px dashed var(--line); }
+
+.empty { text-align: center; color: var(--muted); padding: 56px 20px; }
+.empty b { display: block; font-family: var(--display); font-stretch: 112%; color: var(--ink); font-size: 1.2rem; margin-bottom: 6px; }
+
+/* Sheets */
+dialog { border: 0; padding: 0; background: transparent; max-width: none; max-height: none; width: 100%; margin: auto auto 0; }
+dialog::backdrop { background: rgba(16,16,20,.5); }
+.sheet { background: var(--bg); color: var(--ink); border-top: 1px solid var(--line); padding: 22px 16px calc(18px + env(safe-area-inset-bottom)); max-width: 720px; margin: 0 auto; }
+@media (min-width: 760px) { dialog { margin: auto; } .sheet { border: 1px solid var(--line); padding: 26px; } }
+.sheet h2 { margin: 6px 0 2px; font-family: var(--display); font-stretch: 118%; font-weight: 800; font-size: 1.6rem; text-transform: uppercase; letter-spacing: -.01em; }
+.sheet .eyebrow { color: var(--faint); }
+p.help { margin: 6px 0 0; font-size: .8rem; color: var(--muted); }
+.field { margin-top: 18px; }
+.field label { display: block; color: var(--muted); margin-bottom: 6px; }
+.field input { width: 100%; height: 48px; padding: 0 14px; border: 1px solid var(--line); background: var(--raised); outline: none; }
+.field input:focus { border-color: var(--ink); }
+.actions { display: flex; gap: 10px; margin-top: 22px; }
+.actions button { flex: 1; height: 48px; font-family: var(--mono); font-size: .72rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; }
+.btn-primary { background: var(--ink); color: var(--bg); }
+.btn-ghost { border: 1px solid var(--ink); }
 </style>
 </head>
 <body>
+<nav class="bar-top">
+  <div class="brand mono"><span>Price Check</span></div>
+  <div class="grow"></div>
+  <button id="settingsBtn" aria-label="Settings">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+  </button>
+  <button class="cta mono" id="addBtn">+ Add item</button>
+</nav>
+
 <main>
-  <header>
-    <h1>🏷️ Price Check <small>Best genuine prices in Australia</small></h1>
-    <button id="settingsBtn" aria-label="Settings">⚙️</button>
+  <header class="hero">
+    <h1>Wishlist</h1>
+    <p class="tag-line">Best prices <em>in Australia.</em></p>
+    <div class="meta mono">Genuine retailers · AU warranty · Checked on demand</div>
   </header>
 
-  <div id="setup" class="notice warn" hidden>Add your GitHub token in ⚙️ Settings to start.</div>
+  <div id="setup" class="notice warn" hidden>Add your GitHub token in Settings to start.</div>
   <div id="globalErr" class="notice bad" hidden></div>
-
-  <form class="add card" id="addForm">
-    <input id="newName" placeholder="Name, e.g. Sony headphones" autocomplete="off" maxlength="120" required>
-    <input id="newUrl" type="url" placeholder="Link (optional)" autocomplete="off" maxlength="1000">
-    <button class="primary" type="submit">Add</button>
-  </form>
-
+  <div class="stats" id="stats" hidden></div>
   <div id="list"></div>
 </main>
 
+<dialog id="addSheet">
+  <form method="dialog" class="sheet" id="addForm">
+    <div class="eyebrow mono">New item</div>
+    <h2>Add to wishlist</h2>
+    <p class="help">Claude searches genuine Australian stores as soon as you add it.</p>
+    <div class="field">
+      <label class="mono" for="newName">Name</label>
+      <input id="newName" placeholder="e.g. Sony noise-cancelling headphones" autocomplete="off" maxlength="120" required>
+    </div>
+    <div class="field">
+      <label class="mono" for="newUrl">Link (optional)</label>
+      <input id="newUrl" type="url" inputmode="url" placeholder="https://…" autocomplete="off" maxlength="1000">
+    </div>
+    <div class="actions">
+      <button class="btn-ghost" value="cancel" formnovalidate>Cancel</button>
+      <button class="btn-primary" value="add">Add &amp; search</button>
+    </div>
+  </form>
+</dialog>
+
 <dialog id="settings">
-  <form method="dialog" id="settingsForm">
+  <form method="dialog" class="sheet" id="settingsForm">
+    <div class="eyebrow mono">Preferences</div>
     <h2>Settings</h2>
-    <label for="token">GitHub token</label>
-    <input id="token" type="password" autocomplete="off" placeholder="github_pat_…">
-    <p class="help">Fine-grained token for this repo only, with Actions and Contents set to read &amp; write. Saved only in this browser.</p>
-    <label for="postcode">Postcode (for delivery costs)</label>
-    <input id="postcode" inputmode="numeric" maxlength="4" placeholder="e.g. 2000">
-    <label for="repo">Repository</label>
-    <input id="repo" placeholder="owner/repo">
-    <div class="row">
-      <button value="cancel" formnovalidate>Cancel</button>
-      <button class="primary" value="save">Save</button>
+    <div class="field">
+      <label class="mono" for="token">GitHub token</label>
+      <input id="token" type="password" autocomplete="off" placeholder="github_pat_…">
+      <p class="help">Fine-grained token for this repo only, with Actions and Contents read &amp; write. Saved only in this browser.</p>
+    </div>
+    <div class="field">
+      <label class="mono" for="postcode">Postcode (for delivery costs)</label>
+      <input id="postcode" inputmode="numeric" maxlength="4" placeholder="e.g. 2000">
+    </div>
+    <div class="field">
+      <label class="mono" for="repo">Repository</label>
+      <input id="repo" placeholder="owner/repo">
+    </div>
+    <div class="actions">
+      <button class="btn-ghost" value="cancel" formnovalidate>Cancel</button>
+      <button class="btn-primary" value="save">Save</button>
     </div>
   </form>
 </dialog>
@@ -322,87 +419,125 @@ function showErr(msg) {
   g.hidden = !msg;
 }
 
-function offerTable(offers) {
-  return el('table', { class: 'offers' },
-    el('thead', {}, el('tr', {}, el('th', {}, 'Retailer'), el('th', { class: 'n' }, 'Total'), el('th', { class: 'hide-sm' }, 'Delivery'), el('th', {}, 'Stock'))),
-    el('tbody', {}, offers.map((o) => el('tr', {},
-      el('td', {},
-        safeUrl(o.url) ? el('a', { href: safeUrl(o.url), target: '_blank', rel: 'noopener noreferrer' }, o.retailer || 'Link') : (o.retailer || '—'),
-        o.risky ? el('span', { class: 'tag' }, 'risky') : null,
-        o.verified === false ? el('span', { class: 'tag' }, 'unverified') : null,
-        o.notes ? el('div', { class: 'sub' }, o.notes) : null),
-      el('td', { class: 'n' }, money(o.total ?? o.price)),
-      el('td', { class: 'hide-sm' }, o.delivery || '—'),
-      el('td', {}, o.stock || '—')))));
+const ICON = {
+  search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>',
+  refresh: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>',
+  chevron: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
+  clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+  bolt: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>',
+};
+const icon = (name) => { const s = document.createElement('span'); s.style.display = 'contents'; s.innerHTML = ICON[name]; return s; };
+const fmtTokens = (n) => (n >= 1e6 ? (n / 1e6).toFixed(1) + 'M' : n >= 1000 ? Math.round(n / 1000) + 'k' : String(n));
+const extLink = (href, ...kids) => el('a', { href, target: '_blank', rel: 'noopener noreferrer' }, ...kids);
+
+function offerRows(offers, bestRetailer) {
+  return offers.map((o) => el('div', { class: 'offer' + (o.retailer === bestRetailer ? ' best' : '') },
+    el('div', { class: 'who' },
+      safeUrl(o.url) ? extLink(safeUrl(o.url), o.retailer || 'Link') : el('b', {}, o.retailer || '—'),
+      o.retailer === bestRetailer ? el('span', { class: 'tag good' }, 'best') : null,
+      o.risky ? el('span', { class: 'tag' }, 'risky') : null,
+      o.verified === false ? el('span', { class: 'tag' }, 'unverified') : null,
+      el('div', { class: 'note' }, [o.stock, o.delivery, o.notes].filter(Boolean).join(' · '))),
+    el('div', { class: 'amt' }, money(o.total ?? o.price))));
 }
 
-const fmtTokens = (n) => (n >= 1e6 ? (n / 1e6).toFixed(1) + 'M' : n >= 1000 ? Math.round(n / 1000) + 'k' : String(n));
-
-function itemCard(item) {
+function itemCard(item, index) {
   const r = state.results[item.slug];
+  const ok = r && !r.error;
   const pending = state.pending[item.slug];
   const url = itemUrl(item);
-  const card = el('div', { class: 'card' });
+  const card = el('article', { class: 'card' });
+  card.append(el('div', { class: 'card-head mono' },
+    el('span', {}, String(index + 1).padStart(2, '0') + ' / ' + (ok && r.best?.retailer ? 'Best price found' : pending ? 'Searching' : r?.error ? 'Search failed' : 'Not checked')),
+    el('span', {}, r ? ago(r.checked_at) : '—')));
+  const body = el('div', { class: 'card-body' });
+  card.append(body);
 
-  card.append(el('div', { class: 'item-top' },
-    el('div', { class: 'item-name' }, itemName(item)),
-    el('button', { class: 'primary', disabled: pending ? '' : false, onclick: () => search(item.slug) }, pending ? 'Searching…' : r ? 'Search again' : 'Search'),
-    el('button', { class: 'link', 'aria-label': 'Remove', onclick: () => removeItem(item.slug).catch((e) => showErr(e.message)) }, '✕')));
+  body.append(el('div', { class: 'row' },
+    el('div', { class: 'name' }, itemName(item)),
+    el('button', { class: 'search-btn' + (pending ? ' busy' : ''), disabled: pending ? '' : false, onclick: () => search(item.slug) },
+      icon(pending ? 'refresh' : r ? 'refresh' : 'search'), pending ? 'Searching' : r ? 'Refresh' : 'Search')));
 
-  const meta = el('div', { class: 'meta' }, el('span', {}, r ? 'Checked ' + ago(r.checked_at) : 'Not checked yet'));
-  if (r?.usage?.tokens) {
-    meta.append(el('span', { class: 'tokens', title: r.usage.turns + ' steps, ' + r.usage.seconds + 's' }, '· ' + fmtTokens(r.usage.tokens) + ' tokens'));
+  if (ok && r.best?.retailer) {
+    const genuine = (r.offers || []).filter((o) => !o.risky && typeof (o.total ?? o.price) === 'number');
+    const top = Math.max(...genuine.map((o) => o.total ?? o.price));
+    const save = typeof r.best.total === 'number' && genuine.length > 1 ? top - r.best.total : 0;
+    body.append(el('div', { class: 'price' },
+      el('span', { class: 'amt' }, money(r.best.total)),
+      el('span', { class: 'at' }, 'at ', safeUrl(r.best.url) ? extLink(safeUrl(r.best.url), r.best.retailer) : el('b', {}, r.best.retailer)),
+      save >= 10 ? el('span', { class: 'save' }, 'Save ' + money(save).replace('.00', '')) : null));
+    if (r.best.why) body.append(el('div', { class: 'why' }, r.best.why));
+  } else if (!r && !pending) {
+    body.append(el('div', { class: 'placeholder' }, 'Tap Search to find the best price.'));
   }
-  card.append(meta);
-
-  if (r && !r.error && r.best?.retailer) {
-    card.append(el('div', { class: 'best' },
-      el('div', {}, el('b', {}, money(r.best.total)), ' at ',
-        safeUrl(r.best.url) ? el('a', { href: safeUrl(r.best.url), target: '_blank', rel: 'noopener noreferrer' }, r.best.retailer) : r.best.retailer),
-      r.best.why ? el('div', { class: 'sub' }, r.best.why) : null));
-  }
-  if (r?.error) card.append(el('div', { class: 'err' }, r.error));
-  if (state.runErr[item.slug]) card.append(el('div', { class: 'err' }, state.runErr[item.slug]));
+  if (r?.error) body.append(el('div', { class: 'err' }, r.error));
+  if (state.runErr[item.slug]) body.append(el('div', { class: 'err' }, state.runErr[item.slug]));
   if (pending) {
-    card.append(el('div', { class: 'status' }, el('span', { class: 'spin' }), 'Claude is searching… usually 1–5 min (started ' + ago(new Date(pending).toISOString()) + ')'));
+    body.append(el('div', { class: 'status' }, el('span', { class: 'bar' }),
+      'Claude is checking Australian stores… usually 1–5 min. Started ' + ago(new Date(pending).toISOString()) + '.'));
+  }
+
+  if (r) {
+    const chips = el('div', { class: 'chips' });
+    chips.append(r.usage?.tokens
+      ? el('span', { class: 'chip tok', title: r.usage.turns + ' steps, ' + r.usage.seconds + 's' }, icon('bolt'), fmtTokens(r.usage.tokens) + ' tokens')
+      : el('span', { class: 'chip' }, icon('bolt'), 'Tokens: refresh'));
+        body.append(chips);
   }
 
   const more = el('details', { class: 'more' });
   if (state.open.has(item.slug)) more.open = true;
   more.addEventListener('toggle', () => { more.open ? state.open.add(item.slug) : state.open.delete(item.slug); });
-  const count = r && !r.error ? (r.offers || []).length : 0;
-  more.append(el('summary', {}, count ? 'Link & all offers (' + count + ')' : 'Link & details'));
-  more.append(el('div', { class: 'link-row' },
-    safeUrl(url) ? el('a', { href: safeUrl(url), target: '_blank', rel: 'noopener noreferrer' }, url.replace(/^https?:\/\/(www\.)?/, '')) : el('span', { class: 'sub', style: 'flex:1' }, 'No link saved'),
-    el('button', { class: 'link', onclick: () => renameItem(item.slug).catch((e) => showErr(e.message)) }, 'Rename')));
+  more.append(el('summary', { class: 'mono' }, ok && r.offers?.length ? 'Link & all ' + r.offers.length + ' offers' : 'Link & options', icon('chevron')));
 
-  if (r && !r.error) {
-    const d = el('div', { class: 'details' });
-    if (r.product) d.append(el('p', { class: 'sub' }, 'Matched: ' + r.product));
-    if (r.assumption) d.append(el('p', { class: 'sub' }, 'Assumed: ' + r.assumption));
+  const panel = el('div', { class: 'panel' });
+  panel.append(el('div', { class: 'link-box' },
+    safeUrl(url) ? extLink(safeUrl(url), url.replace(/^https?:\/\/(www\.)?/, '')) : el('span', { class: 'none' }, 'No link saved'),
+    el('button', { class: 'mini', onclick: () => renameItem(item.slug).catch((e) => showErr(e.message)) }, 'Rename'),
+    el('button', { class: 'mini danger', onclick: () => removeItem(item.slug).catch((e) => showErr(e.message)) }, 'Remove')));
+
+  if (ok) {
+    if (r.product) panel.append(el('p', { class: 'matched' }, 'Matched: ' + r.product));
+    if (r.assumption) panel.append(el('p', { class: 'matched' }, 'Assumed: ' + r.assumption));
     const good = (r.offers || []).filter((o) => !o.risky);
     const risky = (r.offers || []).filter((o) => o.risky);
-    if (good.length) d.append(offerTable(good));
-    if (risky.length) d.append(el('h4', {}, 'Cheaper but riskier'), offerTable(risky));
-    if (r.tips?.length) d.append(el('h4', {}, 'Tips'), el('ul', {}, r.tips.map((t) => el('li', {}, t))));
-    if (r.sources?.length) d.append(el('h4', {}, 'Sources'), el('ul', { class: 'src' }, r.sources.map((s) => safeUrl(s) ? el('li', {}, el('a', { href: s, target: '_blank', rel: 'noopener noreferrer' }, s.replace(/^https?:\/\/(www\.)?/, '').slice(0, 70))) : null)));
-    if (r.usage?.tokens) d.append(el('p', { class: 'sub' }, `This search: ${r.usage.tokens.toLocaleString()} tokens, ${r.usage.turns} steps, ${r.usage.seconds}s (≈ US$${r.usage.cost_usd} at API rates; billed to your Claude plan).`));
-    d.append(el('p', { class: 'sub' }, 'Prices change quickly — confirm at checkout.'));
-    more.append(d);
+    if (good.length) panel.append(el('h4', {}, 'Genuine retailers'), el('div', {}, offerRows(good, r.best?.retailer)));
+    if (risky.length) panel.append(el('h4', {}, 'Cheaper but riskier'), el('div', {}, offerRows(risky)));
+    if (r.tips?.length) panel.append(el('h4', {}, 'Tips'), el('ul', { class: 'tips' }, r.tips.map((t) => el('li', {}, t))));
+    const srcs = (r.sources || []).filter(safeUrl);
+    if (srcs.length) panel.append(el('h4', {}, 'Sources'), el('div', { class: 'sources' }, srcs.map((s) => extLink(s, s.replace(/^https?:\/\/(www\.)?/, '').slice(0, 48)))));
+    panel.append(el('div', { class: 'usage' }, r.usage?.tokens
+      ? `This search used ${r.usage.tokens.toLocaleString()} tokens over ${r.usage.turns} steps in ${r.usage.seconds}s (≈ US$${r.usage.cost_usd} at API rates, billed to your Claude plan). Prices change quickly — confirm at checkout.`
+      : 'Token count wasn’t recorded for this older search — tap Refresh to measure it. Prices change quickly — confirm at checkout.'));
   }
-  card.append(more);
+  more.append(panel);
+  body.append(more);
   return card;
+}
+
+function renderStats() {
+  const box = $('#stats');
+  const results = state.wishlist.map((i) => state.results[i.slug]).filter((r) => r && !r.error);
+  if (!state.wishlist.length) { box.hidden = true; return; }
+  const total = results.reduce((s, r) => s + (typeof r.best?.total === 'number' ? r.best.total : 0), 0);
+  const tokens = results.reduce((s, r) => s + (r.usage?.tokens || 0), 0);
+  box.replaceChildren(
+    el('div', { class: 'stat' }, el('b', {}, String(state.wishlist.length)), el('span', { class: 'mono' }, state.wishlist.length === 1 ? 'Item' : 'Items')),
+    el('div', { class: 'stat' }, el('b', {}, total ? money(total).replace(/\.\d\d$/, '') : '—'), el('span', { class: 'mono' }, 'Best total')),
+    el('div', { class: 'stat' }, el('b', {}, tokens ? fmtTokens(tokens) : '—'), el('span', { class: 'mono' }, 'Tokens used')));
+  box.hidden = false;
 }
 
 function render() {
   $('#setup').hidden = !!state.token;
+  renderStats();
   const list = $('#list');
   list.replaceChildren();
   if (!state.wishlist.length) {
-    list.append(el('div', { class: 'empty' }, state.token ? 'Your wishlist is empty. Add an item above.' : ''));
+    if (state.token) list.append(el('div', { class: 'empty' }, el('b', {}, 'Your wishlist is empty'), 'Tap “Add item” to start tracking prices.'));
     return;
   }
-  for (const item of [...state.wishlist].reverse()) list.append(itemCard(item));
+  [...state.wishlist].reverse().forEach((item, i) => list.append(itemCard(item, i)));
 }
 
 async function load() {
@@ -424,14 +559,15 @@ async function load() {
 }
 
 // ---- Events ----
-$('#addForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
+$('#addBtn').addEventListener('click', () => {
   if (!state.token) { openSettings(); return; }
-  const btn = e.target.querySelector('button');
-  btn.disabled = true;
-  try { await addItem($('#newName').value, $('#newUrl').value); $('#newName').value = ''; $('#newUrl').value = ''; showErr(''); }
+  $('#addForm').reset();
+  $('#addSheet').showModal();
+});
+$('#addSheet').addEventListener('close', async () => {
+  if ($('#addSheet').returnValue !== 'add') return;
+  try { await addItem($('#newName').value, $('#newUrl').value); showErr(''); }
   catch (err) { showErr(err.message); }
-  btn.disabled = false;
 });
 
 function openSettings() {
@@ -449,6 +585,8 @@ $('#settings').addEventListener('close', () => {
   LS.set('token', state.token); LS.set('postcode', state.postcode); LS.set('repo', state.repo);
   load();
 });
+// Tapping the dimmed backdrop closes a sheet.
+for (const d of document.querySelectorAll('dialog')) d.addEventListener('click', (e) => { if (e.target === d) d.close('cancel'); });
 document.addEventListener('visibilitychange', () => { if (!document.hidden && Object.keys(state.pending).length) poll(); });
 
 load();
