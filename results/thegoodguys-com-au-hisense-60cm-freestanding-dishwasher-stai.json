@@ -1,6 +1,68 @@
 {
   "item": "https://www.thegoodguys.com.au/hisense-60cm-freestanding-dishwasher-stainless-steel-hsce14fs",
   "postcode": "3978",
-  "checked_at": "2026-10-26T09:24:39.402Z",
-  "error": "Invalid auth token · Fix external auth token · Invalid Authorization header value from CLAUDE_CODE_OAUTH_TOKEN: it contains a line break at character 80 (110 characters on 2 lines)."
+  "checked_at": "2026-10-26T09:28:46.612Z",
+  "product": "Hisense 60cm Freestanding Dishwasher Stainless Steel HSCE14FS",
+  "assumption": "",
+  "best": {
+    "retailer": "The Good Guys",
+    "total": 499,
+    "url": "https://www.thegoodguys.com.au/hisense-60cm-freestanding-dishwasher-stainless-steel-hsce14fs",
+    "why": "Cheapest genuine AU price at $499 (was $699), about $100 below the next lowest. The deal ends 28/10/26. Stock and delivery cost to 3978 weren't shown on the page, so check both at checkout."
+  },
+  "offers": [
+    {
+      "retailer": "The Good Guys",
+      "price": 499,
+      "delivery": "Unknown (not shown on page; free click & collect likely avai",
+      "total": 499,
+      "stock": "Unknown",
+      "url": "https://www.thegoodguys.com.au/hisense-60cm-freestanding-dishwasher-stainless-steel-hsce14fs",
+      "notes": "Monster Deal, $200 off $699. Ends 28/10/26. Delivery cost to 3978 unconfirmed, so the total excludes any delivery fee.",
+      "risky": false
+    },
+    {
+      "retailer": "Bing Lee",
+      "price": 599,
+      "delivery": "Unknown",
+      "total": 599,
+      "stock": "Low stock",
+      "url": "https://www.binglee.com.au/products/14pl-60cm-fstand-dishwasher-ss-hsce14fs",
+      "notes": "Product page shows a $599 Hot Price, but the category page shows $699. Unverified; confirm at checkout.",
+      "risky": false
+    },
+    {
+      "retailer": "Appliances Online",
+      "price": 616,
+      "delivery": "Unknown",
+      "total": 616,
+      "stock": "Unknown",
+      "url": "https://appliancesonline.com.au/product/hisense-60cm-freestanding-stainless-steel-dishwasher-hsce14fs",
+      "notes": "Price from search snippet only. Delivery to 3978 unconfirmed.",
+      "risky": false
+    },
+    {
+      "retailer": "Winnings",
+      "price": 616,
+      "delivery": "Unknown",
+      "total": 616,
+      "stock": "Unknown",
+      "url": "https://www.winnings.com.au/p/hisense-60cm-freestanding-stainless-steel-dishwasher-hsce14fs",
+      "notes": "Price from search snippet only. Delivery to 3978 unconfirmed.",
+      "risky": false
+    }
+  ],
+  "tips": [
+    "The Good Guys deal ends 28/10/26, two days from today. The Good Guys also price matches, so it can match any lower local price.",
+    "Bing Lee price matches too, but at $599 it is still $100 above The Good Guys.",
+    "Check ShopBack or Cashrewards for a cashback rate on The Good Guys before buying.",
+    "Installation is optional and priced separately at The Good Guys."
+  ],
+  "sources": [
+    "https://www.thegoodguys.com.au/hisense-60cm-freestanding-dishwasher-stainless-steel-hsce14fs",
+    "https://www.binglee.com.au/products/14pl-60cm-fstand-dish-ss-hsce14fs",
+    "https://appliancesonline.com.au/product/hisense-60cm-freestanding-stainless-steel-dishwasher-hsce14fs",
+    "https://www.winnings.com.au/p/hisense-60cm-freestanding-stainless-steel-dishwasher-hsce14fs",
+    "https://www.choice.com.au/products/home-and-living/kitchen/dishwashers/hisense-hsce14fs"
+  ]
 }
