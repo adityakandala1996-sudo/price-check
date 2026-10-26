@@ -13,7 +13,7 @@ if (r.assumption) console.log('Assumed: ' + r.assumption);
 if (r.best?.retailer) console.log(`\nBest buy: ${r.best.retailer} at ${money(r.best.total)} — ${r.best.why}\n${r.best.url}`);
 
 const table = (offers) => console.table(offers.map((o) => ({
-  Retailer: o.retailer, Total: money(o.total ?? o.price), Delivery: o.delivery, Stock: o.stock, Notes: o.notes,
+  Retailer: o.retailer + (o.verified === false ? ' (unverified)' : ''), Total: money(o.total ?? o.price), Delivery: o.delivery, Stock: o.stock, Notes: o.notes,
 })));
 const good = r.offers.filter((o) => !o.risky);
 const risky = r.offers.filter((o) => o.risky);

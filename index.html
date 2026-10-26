@@ -295,6 +295,7 @@ function offerTable(offers) {
       el('td', {},
         safeUrl(o.url) ? el('a', { href: safeUrl(o.url), target: '_blank', rel: 'noopener noreferrer' }, o.retailer || 'Link') : (o.retailer || '—'),
         o.risky ? el('span', { class: 'tag' }, 'risky') : null,
+        o.verified === false ? el('span', { class: 'tag' }, 'unverified') : null,
         o.notes ? el('div', { class: 'sub' }, o.notes) : null),
       el('td', { class: 'n' }, money(o.total ?? o.price)),
       el('td', { class: 'hide-sm' }, o.delivery || '—'),

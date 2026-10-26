@@ -24,7 +24,12 @@ function parse() {
   } catch {
     throw new Error('Claude did not return any output (check the CLAUDE_CODE_OAUTH_TOKEN secret).');
   }
-  if (raw.is_error) throw new Error(str(raw.result) || 'Claude reported an error.');
+  if (raw.is_error || /not logged in|\/login/i.test(String(raw.result || ''))) {
+    if (/not logged in|\/login|auth/i.test(String(raw.result || ''))) {
+      throw new Error('Claude is not logged in: the repo secret CLAUDE_CODE_OAUTH_TOKEN is missing or wrong. Run `claude setup-token` and add it under Settings → Secrets and variables → Actions → Secrets.');
+    }
+    throw new Error(str(raw.result) || 'Claude reported an error.');
+  }
   const text = String(raw.result || '');
   const fenced = text.match(/```json\s*([\s\S]*?)```/);
   const body = fenced ? fenced[1] : text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1);
@@ -38,6 +43,7 @@ function parse() {
     url: url(o.url),
     notes: str(o.notes),
     risky: o.risky === true,
+    verified: o.verified === true,
   }));
   const b = d.best || {};
   return {

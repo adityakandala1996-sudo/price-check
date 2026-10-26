@@ -1,0 +1,108 @@
+{
+  "item": "Sony WH-1000XM5",
+  "postcode": "2000",
+  "checked_at": "2026-10-26T09:22:32.048Z",
+  "product": "Sony WH-1000XM5 Wireless Noise Cancelling Headphones (Black; also Silver/Pink at the same price)",
+  "assumption": "Assumed the new WH-1000XM5 (not the newer XM6, not refurbished). Black is the reference colour; Silver and Pink were priced the same at the top retailers.",
+  "best": {
+    "retailer": "Officeworks",
+    "total": 395,
+    "url": "https://www.staticice.com.au/cgi-bin/search.cgi?q=Sony+WH-1000XM5",
+    "why": "Cheapest new, genuine AU-retailer price seen on a StaticICE listing updated 26-10-2026 (Black and Silver, $395). The Good Guys matches it at $395 (updated 25-10-2026). Officeworks was not seen on its own product page, so confirm at checkout."
+  },
+  "offers": [
+    {
+      "retailer": "Officeworks",
+      "price": 395,
+      "delivery": "Free C&C (delivery to 2000 not confirmed)",
+      "total": 395,
+      "stock": "Unknown",
+      "url": "https://www.staticice.com.au/cgi-bin/search.cgi?q=Sony+WH-1000XM5",
+      "notes": "Black and Silver. StaticICE listing updated 26-10-2026. Product page not fetched. Delivery cost and stock not confirmed.",
+      "risky": false,
+      "verified": true
+    },
+    {
+      "retailer": "The Good Guys",
+      "price": 395,
+      "delivery": "Free C&C (delivery to 2000 not confirmed)",
+      "total": 395,
+      "stock": "Unknown",
+      "url": "https://www.thegoodguys.com.au/sony-wh-1000xm5-noise-cancelling-headphones-wh1000xm5b",
+      "notes": "Black, Silver and Pink. StaticICE listing updated 25-10-2026. The Good Guys' own search snippets showed $549, which looks stale. 1-year warranty.",
+      "risky": false,
+      "verified": true
+    },
+    {
+      "retailer": "JB Hi-Fi",
+      "price": 399,
+      "delivery": "Free C&C (delivery to 2000 not confirmed)",
+      "total": 399,
+      "stock": "Unknown",
+      "url": "https://jbhifi.com.au/products/sony-wh-1000xm5-premium-noise-cancelling-wireless-over-ear-headphones-black",
+      "notes": "StaticICE listing updated 24-10-2026 (Black, Silver, Pink at $399). A search snippet of the product page showed $479, which is older and conflicts with this. Price matches usually apply.",
+      "risky": false,
+      "verified": true
+    },
+    {
+      "retailer": "Myer",
+      "price": 399.95,
+      "delivery": "Unknown",
+      "total": 399.95,
+      "stock": "Unknown",
+      "url": "https://www.staticice.com.au/cgi-bin/search.cgi?q=Sony+WH-1000XM5",
+      "notes": "Black, Silver and Pink. StaticICE listing updated 26-10-2026.",
+      "risky": false,
+      "verified": true
+    },
+    {
+      "retailer": "Sony Australia (official store)",
+      "price": 399.95,
+      "delivery": "Unknown",
+      "total": 399.95,
+      "stock": "Unknown",
+      "url": "https://www.sony.com.au/electronics/headband-headphones/wh-1000xm5?sku=wh1000xm5-sme",
+      "notes": "Price from a search snippet; the page was not fetched. The My Sony sign-up offer is 10% off (capped at $100), which could take it to about $360 for new members. A $30 trade-in coupon is also listed. Check the offer terms at checkout.",
+      "risky": false,
+      "verified": false
+    },
+    {
+      "retailer": "Kogan",
+      "price": 389,
+      "delivery": "Unknown (shipping may apply)",
+      "total": 389,
+      "stock": "Unknown",
+      "url": "https://www.kogan.com/au/buy/sony-wh-1000xm5-wireless-noise-cancelling-headphones-black-sony/",
+      "notes": "$389 for Kogan First members, $399 otherwise. Snippet is undated. Kogan often sells grey imports, so check for AU warranty.",
+      "risky": true,
+      "verified": false
+    },
+    {
+      "retailer": "Sony Australia eBay store (refurbished/seconds)",
+      "price": 223.2,
+      "delivery": "Free",
+      "total": 223.2,
+      "stock": "Unknown",
+      "url": "https://www.ozbargain.com.au/node/979127",
+      "notes": "Refurbished stock, not new. $279 less 20% with code SONYCLEARANCE. The OzBargain post is about 11 days old, so it may have expired. Some states are excluded (WA, TAS, NT).",
+      "risky": true,
+      "verified": false
+    }
+  ],
+  "tips": [
+    "The Good Guys, JB Hi-Fi and Officeworks sit within about $4 of each other, so it makes little difference where you buy.",
+    "JB Hi-Fi and The Good Guys price match. Officeworks beats a lower local price by 5%, which could take a price-matched $395 to roughly $375. Take the competitor's page with you.",
+    "Sony's My Sony sign-up code gives 10% off (capped at $100), which could make the official store about $360 for new members. A $30 trade-in coupon is also listed.",
+    "The refurbished option from Sony's eBay store (about $223 with SONYCLEARANCE) is much cheaper if you accept refurbished stock. Check whether it has expired.",
+    "Click Frenzy and Black Friday are about a month away and may bring a lower price. The XM6 successor has also pushed XM5 prices down."
+  ],
+  "sources": [
+    "https://www.staticice.com.au/cgi-bin/search.cgi?q=Sony+WH-1000XM5",
+    "https://www.thegoodguys.com.au/sony-wh-1000xm5-noise-cancelling-headphones-wh1000xm5b",
+    "https://jbhifi.com.au/products/sony-wh-1000xm5-premium-noise-cancelling-wireless-over-ear-headphones-black",
+    "https://www.sony.com.au/electronics/headband-headphones/wh-1000xm5?sku=wh1000xm5-sme",
+    "https://www.kogan.com/au/buy/sony-wh-1000xm5-wireless-noise-cancelling-headphones-black-sony/",
+    "https://www.ozbargain.com.au/node/979127",
+    "https://www.priceme.com.au/Sony-WH-1000XM5/p-912855968.aspx"
+  ]
+}
