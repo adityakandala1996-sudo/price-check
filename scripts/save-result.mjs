@@ -17,6 +17,22 @@ const str = (v, n = 300) => (typeof v === 'string' ? v.slice(0, n) : '');
 const num = (v) => (typeof v === 'number' && isFinite(v) ? Math.round(v * 100) / 100 : null);
 const url = (v) => (typeof v === 'string' && /^https?:\/\//.test(v) ? v.slice(0, 1000) : '');
 
+// Total tokens across every model the run used (Sonnet plus the Haiku page reader).
+function readUsage(raw) {
+  let tokens = 0;
+  for (const m of Object.values(raw.modelUsage || {})) {
+    tokens += (m.inputTokens || 0) + (m.outputTokens || 0) + (m.cacheReadInputTokens || 0) + (m.cacheCreationInputTokens || 0);
+  }
+  if (!tokens) return null;
+  return {
+    tokens,
+    cost_usd: num(raw.total_cost_usd),
+    turns: num(raw.num_turns),
+    seconds: Math.round((raw.duration_ms || 0) / 1000),
+  };
+}
+
+let usage = null;
 function parse() {
   let raw;
   try {
@@ -24,6 +40,7 @@ function parse() {
   } catch {
     throw new Error('Claude did not return any output (check the CLAUDE_CODE_OAUTH_TOKEN secret).');
   }
+  usage = readUsage(raw);
   if (raw.is_error || /not logged in|\/login/i.test(String(raw.result || ''))) {
     if (/not logged in|\/login|auth/i.test(String(raw.result || ''))) {
       throw new Error('Claude is not logged in: the repo secret CLAUDE_CODE_OAUTH_TOKEN is missing or wrong. Run `claude setup-token` and add it under Settings → Secrets and variables → Actions → Secrets.');
@@ -62,5 +79,6 @@ try {
 } catch (e) {
   result = { ...base, error: str(e.message, 500) || 'Could not read the result.' };
 }
+if (usage) result.usage = usage;
 writeFileSync(`results/${slug}.json`, JSON.stringify(result, null, 2) + '\n');
 console.log(result.error ? `Saved error: ${result.error}` : `Saved ${result.offers.length} offers`);

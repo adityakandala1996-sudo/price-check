@@ -20,4 +20,5 @@ const risky = r.offers.filter((o) => o.risky);
 if (good.length) table(good);
 if (risky.length) { console.log('Cheaper but riskier:'); table(risky); }
 for (const t of r.tips || []) console.log('Tip: ' + t);
+if (r.usage) console.log(`\nUsage: ${r.usage.tokens.toLocaleString()} tokens, ${r.usage.turns} steps, ${r.usage.seconds}s (≈ US$${r.usage.cost_usd} at API rates)`);
 console.log(`\nSaved to ${process.argv[2]} (checked ${new Date(r.checked_at).toLocaleString('en-AU')})`);

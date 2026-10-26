@@ -45,8 +45,19 @@ input {
 }
 label { display: block; font-size: .85rem; color: var(--muted); margin: 12px 0 4px; }
 .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px; margin-bottom: 12px; }
-form.add { display: flex; gap: 8px; }
-form.add input { flex: 1; }
+form.add { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+form.add #newName { grid-column: 1 / -1; }
+.item-top { display: flex; align-items: center; gap: 8px; }
+.item-top .item-name { flex: 1; min-width: 0; }
+.meta { display: flex; flex-wrap: wrap; gap: 4px 10px; color: var(--muted); font-size: .82rem; margin-top: 2px; }
+.tokens { white-space: nowrap; }
+details.more { margin-top: 10px; border-top: 1px solid var(--line); padding-top: 6px; }
+details.more summary { cursor: pointer; color: var(--muted); font-size: .9rem; padding: 6px 0; list-style: none; }
+details.more summary::-webkit-details-marker { display: none; }
+details.more summary::before { content: '▸ '; }
+details.more[open] summary::before { content: '▾ '; }
+.link-row { display: flex; gap: 8px; align-items: center; font-size: .85rem; margin: 4px 0 6px; }
+.link-row a { color: var(--accent); word-break: break-all; flex: 1; min-width: 0; }
 .notice { padding: 12px 14px; border-radius: 12px; margin-bottom: 12px; font-size: .92rem; }
 .notice.warn { background: var(--warn-soft); color: var(--warn); }
 .notice.bad { background: var(--bad-soft); color: var(--bad); }
@@ -92,7 +103,8 @@ dialog .row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18
   <div id="globalErr" class="notice bad" hidden></div>
 
   <form class="add card" id="addForm">
-    <input id="newItem" placeholder="Add item, e.g. Sony WH-1000XM5 or a link" autocomplete="off" maxlength="300" required>
+    <input id="newName" placeholder="Name, e.g. Sony headphones" autocomplete="off" maxlength="120" required>
+    <input id="newUrl" type="url" placeholder="Link (optional)" autocomplete="off" maxlength="1000">
     <button class="primary" type="submit">Add</button>
   </form>
 
@@ -204,15 +216,35 @@ async function saveWishlist(mutate, message) {
 }
 
 // ---- Actions ----
-async function addItem(name) {
+const isUrl = (s) => /^https?:\/\//i.test(s || '');
+// Items added before names existed stored the link as the name.
+const itemUrl = (i) => i.url || (isUrl(i.name) ? i.name : '');
+const itemName = (i) => {
+  if (!isUrl(i.name)) return i.name;
+  const r = state.results[i.slug];
+  if (r?.product) return r.product;
+  try { return new URL(i.name).hostname.replace(/^www\./, ''); } catch { return i.name; }
+};
+
+async function addItem(name, url) {
   name = name.trim();
+  url = (url || '').trim();
   if (!name) return;
+  if (url && !isUrl(url)) throw new Error('The link must start with http:// or https://');
   let slug = slugify(name);
   const taken = new Set(state.wishlist.map((i) => i.slug));
   for (let n = 2; taken.has(slug); n++) slug = slugify(name).slice(0, 56) + '-' + n;
-  await saveWishlist((l) => [...l, { slug, name, added: new Date().toISOString() }], 'Add ' + slug);
+  await saveWishlist((l) => [...l, { slug, name, url: url || undefined, added: new Date().toISOString() }], 'Add ' + slug);
   render();
   search(slug);
+}
+
+async function renameItem(slug) {
+  const item = state.wishlist.find((i) => i.slug === slug);
+  const name = prompt('Name for this item', itemName(item));
+  if (!name || !name.trim()) return;
+  await saveWishlist((l) => l.map((i) => (i.slug === slug ? { ...i, name: name.trim().slice(0, 120), url: itemUrl(i) || undefined } : i)), 'Rename ' + slug);
+  render();
 }
 
 async function removeItem(slug) {
@@ -229,7 +261,9 @@ async function search(slug) {
   try {
     await gh('/actions/workflows/price-check.yml/dispatches', {
       method: 'POST',
-      body: JSON.stringify({ ref: 'main', inputs: { item: item.name, slug, postcode: state.postcode || '' } }),
+      body: JSON.stringify({ ref: 'main', inputs: {
+        item: isUrl(item.name) ? item.name : [item.name, item.url].filter(Boolean).join(' — '),
+        slug, postcode: state.postcode || '' } }),
     });
     state.pending[slug] = Date.now();
     LS.set('pending', state.pending);
@@ -302,18 +336,24 @@ function offerTable(offers) {
       el('td', {}, o.stock || '—')))));
 }
 
+const fmtTokens = (n) => (n >= 1e6 ? (n / 1e6).toFixed(1) + 'M' : n >= 1000 ? Math.round(n / 1000) + 'k' : String(n));
+
 function itemCard(item) {
   const r = state.results[item.slug];
   const pending = state.pending[item.slug];
-  const open = state.open.has(item.slug);
+  const url = itemUrl(item);
   const card = el('div', { class: 'card' });
 
-  card.append(el('div', { class: 'item-head' },
-    el('div', {},
-      el('div', { class: 'item-name' }, item.name),
-      r && !r.error && r.product && r.product !== item.name ? el('div', { class: 'sub' }, r.product) : null,
-      r ? el('div', { class: 'sub' }, 'Checked ' + ago(r.checked_at)) : el('div', { class: 'sub' }, 'Not checked yet')),
+  card.append(el('div', { class: 'item-top' },
+    el('div', { class: 'item-name' }, itemName(item)),
+    el('button', { class: 'primary', disabled: pending ? '' : false, onclick: () => search(item.slug) }, pending ? 'Searching…' : r ? 'Search again' : 'Search'),
     el('button', { class: 'link', 'aria-label': 'Remove', onclick: () => removeItem(item.slug).catch((e) => showErr(e.message)) }, '✕')));
+
+  const meta = el('div', { class: 'meta' }, el('span', {}, r ? 'Checked ' + ago(r.checked_at) : 'Not checked yet'));
+  if (r?.usage?.tokens) {
+    meta.append(el('span', { class: 'tokens', title: r.usage.turns + ' steps, ' + r.usage.seconds + 's' }, '· ' + fmtTokens(r.usage.tokens) + ' tokens'));
+  }
+  card.append(meta);
 
   if (r && !r.error && r.best?.retailer) {
     card.append(el('div', { class: 'best' },
@@ -323,20 +363,22 @@ function itemCard(item) {
   }
   if (r?.error) card.append(el('div', { class: 'err' }, r.error));
   if (state.runErr[item.slug]) card.append(el('div', { class: 'err' }, state.runErr[item.slug]));
-
   if (pending) {
-    card.append(el('div', { class: 'status' }, el('span', { class: 'spin' }), 'Claude is searching… usually 3–5 min (started ' + ago(new Date(pending).toISOString()) + ')'));
+    card.append(el('div', { class: 'status' }, el('span', { class: 'spin' }), 'Claude is searching… usually 1–5 min (started ' + ago(new Date(pending).toISOString()) + ')'));
   }
 
-  const actions = el('div', { class: 'actions' },
-    el('button', { class: 'primary', disabled: pending ? '' : false, onclick: () => search(item.slug) }, r ? 'Search again' : 'Search'));
-  if (r && !r.error && r.offers?.length) {
-    actions.append(el('button', { onclick: () => { open ? state.open.delete(item.slug) : state.open.add(item.slug); render(); } }, open ? 'Hide offers' : 'All offers (' + r.offers.length + ')'));
-  }
-  card.append(actions);
+  const more = el('details', { class: 'more' });
+  if (state.open.has(item.slug)) more.open = true;
+  more.addEventListener('toggle', () => { more.open ? state.open.add(item.slug) : state.open.delete(item.slug); });
+  const count = r && !r.error ? (r.offers || []).length : 0;
+  more.append(el('summary', {}, count ? 'Link & all offers (' + count + ')' : 'Link & details'));
+  more.append(el('div', { class: 'link-row' },
+    safeUrl(url) ? el('a', { href: safeUrl(url), target: '_blank', rel: 'noopener noreferrer' }, url.replace(/^https?:\/\/(www\.)?/, '')) : el('span', { class: 'sub', style: 'flex:1' }, 'No link saved'),
+    el('button', { class: 'link', onclick: () => renameItem(item.slug).catch((e) => showErr(e.message)) }, 'Rename')));
 
-  if (open && r && !r.error) {
+  if (r && !r.error) {
     const d = el('div', { class: 'details' });
+    if (r.product) d.append(el('p', { class: 'sub' }, 'Matched: ' + r.product));
     if (r.assumption) d.append(el('p', { class: 'sub' }, 'Assumed: ' + r.assumption));
     const good = (r.offers || []).filter((o) => !o.risky);
     const risky = (r.offers || []).filter((o) => o.risky);
@@ -344,9 +386,11 @@ function itemCard(item) {
     if (risky.length) d.append(el('h4', {}, 'Cheaper but riskier'), offerTable(risky));
     if (r.tips?.length) d.append(el('h4', {}, 'Tips'), el('ul', {}, r.tips.map((t) => el('li', {}, t))));
     if (r.sources?.length) d.append(el('h4', {}, 'Sources'), el('ul', { class: 'src' }, r.sources.map((s) => safeUrl(s) ? el('li', {}, el('a', { href: s, target: '_blank', rel: 'noopener noreferrer' }, s.replace(/^https?:\/\/(www\.)?/, '').slice(0, 70))) : null)));
+    if (r.usage?.tokens) d.append(el('p', { class: 'sub' }, `This search: ${r.usage.tokens.toLocaleString()} tokens, ${r.usage.turns} steps, ${r.usage.seconds}s (≈ US$${r.usage.cost_usd} at API rates; billed to your Claude plan).`));
     d.append(el('p', { class: 'sub' }, 'Prices change quickly — confirm at checkout.'));
-    card.append(d);
+    more.append(d);
   }
+  card.append(more);
   return card;
 }
 
@@ -383,10 +427,9 @@ async function load() {
 $('#addForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   if (!state.token) { openSettings(); return; }
-  const input = $('#newItem');
   const btn = e.target.querySelector('button');
   btn.disabled = true;
-  try { await addItem(input.value); input.value = ''; showErr(''); }
+  try { await addItem($('#newName').value, $('#newUrl').value); $('#newName').value = ''; $('#newUrl').value = ''; showErr(''); }
   catch (err) { showErr(err.message); }
   btn.disabled = false;
 });
