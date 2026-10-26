@@ -1,0 +1,74 @@
+name: price-check
+run-name: Price check ${{ inputs.slug }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      item:
+        description: Product name or link
+        required: true
+        type: string
+      slug:
+        description: File name for the result (a-z, 0-9, -)
+        required: true
+        type: string
+      postcode:
+        description: Australian postcode for delivery costs
+        required: false
+        type: string
+        default: ''
+
+permissions:
+  contents: write
+
+concurrency:
+  group: price-check-${{ inputs.slug }}
+  cancel-in-progress: true
+
+jobs:
+  search:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Run price check
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          ITEM: ${{ inputs.item }}
+          POSTCODE: ${{ inputs.postcode }}
+        run: |
+          node scripts/prompt.mjs > prompt.txt
+          claude -p "$(cat prompt.txt)" \
+            --model sonnet \
+            --allowedTools "WebSearch,WebFetch" \
+            --max-turns 60 \
+            --output-format json > out.json || true
+
+      - name: Save result
+        env:
+          ITEM: ${{ inputs.item }}
+          SLUG: ${{ inputs.slug }}
+          POSTCODE: ${{ inputs.postcode }}
+        run: node scripts/save-result.mjs out.json
+
+      - name: Commit result
+        env:
+          SLUG: ${{ inputs.slug }}
+        run: |
+          git config user.name "price-check bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add results/
+          git commit -m "Price check: $SLUG" || exit 0
+          for i in 1 2 3 4 5; do
+            git pull --rebase && git push && exit 0
+            sleep $((i * 5))
+          done
+          exit 1

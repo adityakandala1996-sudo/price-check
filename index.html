@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Price Check</title>
+<meta name="theme-color" content="#0f766e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Price Check">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏷️</text></svg>">
+<style>
+:root {
+  --bg: #f6f7f9; --card: #ffffff; --text: #16191d; --muted: #5d6670; --line: #e3e6ea;
+  --accent: #0f766e; --accent-ink: #ffffff; --accent-soft: #e2f3f1;
+  --warn: #9a5b00; --warn-soft: #fff4e0; --bad: #b42318; --bad-soft: #fdecea;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #101317; --card: #1a1e24; --text: #eef1f4; --muted: #9aa4ae; --line: #2b3139;
+    --accent: #2dd4bf; --accent-ink: #062a26; --accent-soft: #123532;
+    --warn: #f5b546; --warn-soft: #3a2c10; --bad: #f97066; --bad-soft: #3d1a17;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 16px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+main { max-width: 720px; margin: 0 auto; padding: 16px 16px calc(32px + env(safe-area-inset-bottom)); }
+header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 4px 0 16px; }
+h1 { font-size: 1.4rem; margin: 0; }
+h1 small { display: block; font-size: .8rem; font-weight: 400; color: var(--muted); }
+button, input { font: inherit; }
+button {
+  border: 1px solid var(--line); background: var(--card); color: var(--text);
+  border-radius: 10px; padding: 8px 14px; cursor: pointer; min-height: 40px;
+}
+button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
+button:disabled { opacity: .55; cursor: default; }
+button.link { border: 0; background: none; color: var(--muted); padding: 8px; min-height: 0; }
+input {
+  width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px;
+  background: var(--card); color: var(--text); min-height: 44px;
+}
+label { display: block; font-size: .85rem; color: var(--muted); margin: 12px 0 4px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px; margin-bottom: 12px; }
+form.add { display: flex; gap: 8px; }
+form.add input { flex: 1; }
+.notice { padding: 12px 14px; border-radius: 12px; margin-bottom: 12px; font-size: .92rem; }
+.notice.warn { background: var(--warn-soft); color: var(--warn); }
+.notice.bad { background: var(--bad-soft); color: var(--bad); }
+.item-head { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
+.item-name { font-weight: 600; word-break: break-word; }
+.sub { color: var(--muted); font-size: .85rem; }
+.best { margin-top: 10px; padding: 10px 12px; background: var(--accent-soft); border-radius: 10px; }
+.best b { font-size: 1.15rem; }
+.best a { color: var(--accent); font-weight: 600; }
+.actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.status { margin-top: 10px; font-size: .9rem; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+.spin { width: 14px; height: 14px; border: 2px solid var(--line); border-top-color: var(--accent); border-radius: 50%; animation: s 1s linear infinite; }
+@keyframes s { to { transform: rotate(360deg); } }
+.err { margin-top: 10px; color: var(--bad); font-size: .9rem; }
+.offers { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: .9rem; }
+.offers th, .offers td { text-align: left; padding: 8px 6px; border-top: 1px solid var(--line); vertical-align: top; }
+.offers th { color: var(--muted); font-weight: 500; font-size: .8rem; }
+.offers td.n { text-align: right; white-space: nowrap; }
+.offers a { color: var(--accent); }
+.tag { display: inline-block; font-size: .72rem; padding: 1px 6px; border-radius: 6px; background: var(--warn-soft); color: var(--warn); margin-left: 4px; }
+.details h4 { margin: 14px 0 4px; font-size: .9rem; }
+.details ul { margin: 4px 0; padding-left: 20px; font-size: .9rem; }
+.details .src a { color: var(--muted); word-break: break-all; font-size: .8rem; }
+.empty { text-align: center; color: var(--muted); padding: 32px 16px; }
+dialog { border: 0; border-radius: 16px; padding: 18px; width: min(480px, calc(100vw - 32px)); background: var(--card); color: var(--text); }
+dialog::backdrop { background: rgba(0,0,0,.45); }
+dialog h2 { margin: 0 0 4px; font-size: 1.15rem; }
+dialog .help { font-size: .82rem; color: var(--muted); margin: 4px 0 0; }
+dialog .row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; }
+@media (max-width: 520px) {
+  .offers .hide-sm { display: none; }
+}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>🏷️ Price Check <small>Best genuine prices in Australia</small></h1>
+    <button id="settingsBtn" aria-label="Settings">⚙️</button>
+  </header>
+
+  <div id="setup" class="notice warn" hidden>Add your GitHub token in ⚙️ Settings to start.</div>
+  <div id="globalErr" class="notice bad" hidden></div>
+
+  <form class="add card" id="addForm">
+    <input id="newItem" placeholder="Add item, e.g. Sony WH-1000XM5 or a link" autocomplete="off" maxlength="300" required>
+    <button class="primary" type="submit">Add</button>
+  </form>
+
+  <div id="list"></div>
+</main>
+
+<dialog id="settings">
+  <form method="dialog" id="settingsForm">
+    <h2>Settings</h2>
+    <label for="token">GitHub token</label>
+    <input id="token" type="password" autocomplete="off" placeholder="github_pat_…">
+    <p class="help">Fine-grained token for this repo only, with Actions and Contents set to read &amp; write. Saved only in this browser.</p>
+    <label for="postcode">Postcode (for delivery costs)</label>
+    <input id="postcode" inputmode="numeric" maxlength="4" placeholder="e.g. 2000">
+    <label for="repo">Repository</label>
+    <input id="repo" placeholder="owner/repo">
+    <div class="row">
+      <button value="cancel" formnovalidate>Cancel</button>
+      <button class="primary" value="save">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+const LS = {
+  get(k, d) { try { const v = localStorage.getItem('pc.' + k); return v === null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem('pc.' + k, JSON.stringify(v)); } catch {} },
+};
+
+function defaultRepo() {
+  const h = location.hostname;
+  if (h.endsWith('.github.io')) return h.split('.')[0] + '/' + (location.pathname.split('/')[1] || 'price-check');
+  return '';
+}
+
+const state = {
+  token: LS.get('token', ''),
+  postcode: LS.get('postcode', ''),
+  repo: LS.get('repo', '') || defaultRepo(),
+  pending: LS.get('pending', {}),      // slug -> dispatch time (ms)
+  wishlist: [],
+  wishSha: null,
+  results: {},                         // slug -> result json
+  open: new Set(),
+};
+
+const $ = (s) => document.querySelector(s);
+const el = (tag, attrs = {}, ...kids) => {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === 'class') n.className = v;
+    else if (k.startsWith('on')) n.addEventListener(k.slice(2), v);
+    else if (v !== false && v != null) n.setAttribute(k, v);
+  }
+  for (const c of kids.flat()) if (c != null && c !== false) n.append(c.nodeType ? c : String(c));
+  return n;
+};
+const safeUrl = (u) => (typeof u === 'string' && /^https?:\/\//.test(u) ? u : null);
+const money = (v) => (typeof v === 'number' ? '$' + v.toLocaleString('en-AU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '—');
+const ago = (iso) => {
+  const s = (Date.now() - new Date(iso)) / 1000;
+  if (s < 90) return 'just now';
+  if (s < 3600) return Math.round(s / 60) + ' min ago';
+  if (s < 86400) return Math.round(s / 3600) + ' h ago';
+  return new Date(iso).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' });
+};
+const slugify = (s) => s.toLowerCase().replace(/https?:\/\/(www\.)?/, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'item';
+
+// ---- GitHub API ----
+async function gh(path, opts = {}) {
+  const res = await fetch('https://api.github.com/repos/' + state.repo + path, {
+    ...opts,
+    cache: 'no-store',
+    headers: {
+      Accept: 'application/vnd.github+json',
+      Authorization: 'Bearer ' + state.token,
+      'X-GitHub-Api-Version': '2022-11-28',
+      ...(opts.body ? { 'Content-Type': 'application/json' } : {}),
+    },
+  });
+  if (res.status === 404) return null;
+  if (!res.ok) {
+    let msg = res.status + ' ' + res.statusText;
+    try { msg = (await res.json()).message || msg; } catch {}
+    if (res.status === 401) msg = 'GitHub token is invalid or expired — update it in Settings.';
+    if (res.status === 403) msg = 'GitHub token lacks permission (needs Actions + Contents read & write on this repo). ' + msg;
+    throw new Error(msg);
+  }
+  return res.status === 204 ? true : res.json();
+}
+const b64decode = (s) => new TextDecoder().decode(Uint8Array.from(atob(s.replace(/\n/g, '')), (c) => c.charCodeAt(0)));
+const b64encode = (s) => { let bin = ''; for (const b of new TextEncoder().encode(s)) bin += String.fromCharCode(b); return btoa(bin); };
+
+async function getJson(path) {
+  const f = await gh('/contents/' + path);
+  if (!f) return { sha: null, data: null };
+  return { sha: f.sha, data: JSON.parse(b64decode(f.content)) };
+}
+
+async function saveWishlist(mutate, message) {
+  const { sha, data } = await getJson('wishlist.json');   // fresh copy avoids overwriting edits from another device
+  const list = mutate(Array.isArray(data) ? data : []);
+  const r = await gh('/contents/wishlist.json', {
+    method: 'PUT',
+    body: JSON.stringify({ message, content: b64encode(JSON.stringify(list, null, 2) + '\n'), sha: sha || undefined }),
+  });
+  state.wishlist = list;
+  state.wishSha = r.content.sha;
+}
+
+// ---- Actions ----
+async function addItem(name) {
+  name = name.trim();
+  if (!name) return;
+  let slug = slugify(name);
+  const taken = new Set(state.wishlist.map((i) => i.slug));
+  for (let n = 2; taken.has(slug); n++) slug = slugify(name).slice(0, 56) + '-' + n;
+  await saveWishlist((l) => [...l, { slug, name, added: new Date().toISOString() }], 'Add ' + slug);
+  render();
+  search(slug);
+}
+
+async function removeItem(slug) {
+  if (!confirm('Remove this item from your wishlist?')) return;
+  await saveWishlist((l) => l.filter((i) => i.slug !== slug), 'Remove ' + slug);
+  delete state.pending[slug];
+  LS.set('pending', state.pending);
+  render();
+}
+
+async function search(slug) {
+  const item = state.wishlist.find((i) => i.slug === slug);
+  if (!item) return;
+  try {
+    await gh('/actions/workflows/price-check.yml/dispatches', {
+      method: 'POST',
+      body: JSON.stringify({ ref: 'main', inputs: { item: item.name, slug, postcode: state.postcode || '' } }),
+    });
+    state.pending[slug] = Date.now();
+    LS.set('pending', state.pending);
+    delete state.runErr?.[slug];
+  } catch (e) {
+    showErr(e.message);
+  }
+  render();
+  schedulePoll();
+}
+
+let pollTimer = null;
+function schedulePoll() {
+  clearTimeout(pollTimer);
+  if (Object.keys(state.pending).length) pollTimer = setTimeout(poll, 15000);
+}
+
+state.runErr = {};
+async function poll() {
+  const slugs = Object.keys(state.pending);
+  if (!slugs.length) return;
+  let runs = [];
+  try {
+    const r = await gh('/actions/workflows/price-check.yml/runs?event=workflow_dispatch&per_page=30');
+    runs = r?.workflow_runs || [];
+  } catch {}
+  for (const slug of slugs) {
+    const since = state.pending[slug];
+    try {
+      const { data } = await getJson('results/' + slug + '.json');
+      if (data && new Date(data.checked_at).getTime() > since - 5000) {
+        state.results[slug] = data;
+        delete state.pending[slug];
+        state.open.add(slug);
+        continue;
+      }
+    } catch {}
+    const run = runs.find((r) => r.display_title === 'Price check ' + slug && new Date(r.created_at).getTime() > since - 60000);
+    if (run && run.status === 'completed' && run.conclusion !== 'success') {
+      state.runErr[slug] = 'The search job ' + run.conclusion + '. Open the Actions tab on GitHub to see why.';
+      delete state.pending[slug];
+    } else if (Date.now() - since > 25 * 60000) {
+      state.runErr[slug] = 'Timed out waiting for results.';
+      delete state.pending[slug];
+    }
+  }
+  LS.set('pending', state.pending);
+  render();
+  schedulePoll();
+}
+
+// ---- Render ----
+function showErr(msg) {
+  const g = $('#globalErr');
+  g.textContent = msg || '';
+  g.hidden = !msg;
+}
+
+function offerTable(offers) {
+  return el('table', { class: 'offers' },
+    el('thead', {}, el('tr', {}, el('th', {}, 'Retailer'), el('th', { class: 'n' }, 'Total'), el('th', { class: 'hide-sm' }, 'Delivery'), el('th', {}, 'Stock'))),
+    el('tbody', {}, offers.map((o) => el('tr', {},
+      el('td', {},
+        safeUrl(o.url) ? el('a', { href: safeUrl(o.url), target: '_blank', rel: 'noopener noreferrer' }, o.retailer || 'Link') : (o.retailer || '—'),
+        o.risky ? el('span', { class: 'tag' }, 'risky') : null,
+        o.notes ? el('div', { class: 'sub' }, o.notes) : null),
+      el('td', { class: 'n' }, money(o.total ?? o.price)),
+      el('td', { class: 'hide-sm' }, o.delivery || '—'),
+      el('td', {}, o.stock || '—')))));
+}
+
+function itemCard(item) {
+  const r = state.results[item.slug];
+  const pending = state.pending[item.slug];
+  const open = state.open.has(item.slug);
+  const card = el('div', { class: 'card' });
+
+  card.append(el('div', { class: 'item-head' },
+    el('div', {},
+      el('div', { class: 'item-name' }, item.name),
+      r && !r.error && r.product && r.product !== item.name ? el('div', { class: 'sub' }, r.product) : null,
+      r ? el('div', { class: 'sub' }, 'Checked ' + ago(r.checked_at)) : el('div', { class: 'sub' }, 'Not checked yet')),
+    el('button', { class: 'link', 'aria-label': 'Remove', onclick: () => removeItem(item.slug).catch((e) => showErr(e.message)) }, '✕')));
+
+  if (r && !r.error && r.best?.retailer) {
+    card.append(el('div', { class: 'best' },
+      el('div', {}, el('b', {}, money(r.best.total)), ' at ',
+        safeUrl(r.best.url) ? el('a', { href: safeUrl(r.best.url), target: '_blank', rel: 'noopener noreferrer' }, r.best.retailer) : r.best.retailer),
+      r.best.why ? el('div', { class: 'sub' }, r.best.why) : null));
+  }
+  if (r?.error) card.append(el('div', { class: 'err' }, r.error));
+  if (state.runErr[item.slug]) card.append(el('div', { class: 'err' }, state.runErr[item.slug]));
+
+  if (pending) {
+    card.append(el('div', { class: 'status' }, el('span', { class: 'spin' }), 'Claude is searching… usually 3–5 min (started ' + ago(new Date(pending).toISOString()) + ')'));
+  }
+
+  const actions = el('div', { class: 'actions' },
+    el('button', { class: 'primary', disabled: pending ? '' : false, onclick: () => search(item.slug) }, r ? 'Search again' : 'Search'));
+  if (r && !r.error && r.offers?.length) {
+    actions.append(el('button', { onclick: () => { open ? state.open.delete(item.slug) : state.open.add(item.slug); render(); } }, open ? 'Hide offers' : 'All offers (' + r.offers.length + ')'));
+  }
+  card.append(actions);
+
+  if (open && r && !r.error) {
+    const d = el('div', { class: 'details' });
+    if (r.assumption) d.append(el('p', { class: 'sub' }, 'Assumed: ' + r.assumption));
+    const good = (r.offers || []).filter((o) => !o.risky);
+    const risky = (r.offers || []).filter((o) => o.risky);
+    if (good.length) d.append(offerTable(good));
+    if (risky.length) d.append(el('h4', {}, 'Cheaper but riskier'), offerTable(risky));
+    if (r.tips?.length) d.append(el('h4', {}, 'Tips'), el('ul', {}, r.tips.map((t) => el('li', {}, t))));
+    if (r.sources?.length) d.append(el('h4', {}, 'Sources'), el('ul', { class: 'src' }, r.sources.map((s) => safeUrl(s) ? el('li', {}, el('a', { href: s, target: '_blank', rel: 'noopener noreferrer' }, s.replace(/^https?:\/\/(www\.)?/, '').slice(0, 70))) : null)));
+    d.append(el('p', { class: 'sub' }, 'Prices change quickly — confirm at checkout.'));
+    card.append(d);
+  }
+  return card;
+}
+
+function render() {
+  $('#setup').hidden = !!state.token;
+  const list = $('#list');
+  list.replaceChildren();
+  if (!state.wishlist.length) {
+    list.append(el('div', { class: 'empty' }, state.token ? 'Your wishlist is empty. Add an item above.' : ''));
+    return;
+  }
+  for (const item of [...state.wishlist].reverse()) list.append(itemCard(item));
+}
+
+async function load() {
+  showErr('');
+  if (!state.token || !state.repo) { render(); return; }
+  try {
+    const w = await getJson('wishlist.json');
+    state.wishlist = Array.isArray(w.data) ? w.data : [];
+    state.wishSha = w.sha;
+    await Promise.all(state.wishlist.map(async (i) => {
+      const { data } = await getJson('results/' + i.slug + '.json');
+      if (data) state.results[i.slug] = data;
+    }));
+  } catch (e) {
+    showErr(e.message);
+  }
+  render();
+  if (Object.keys(state.pending).length) poll();
+}
+
+// ---- Events ----
+$('#addForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!state.token) { openSettings(); return; }
+  const input = $('#newItem');
+  const btn = e.target.querySelector('button');
+  btn.disabled = true;
+  try { await addItem(input.value); input.value = ''; showErr(''); }
+  catch (err) { showErr(err.message); }
+  btn.disabled = false;
+});
+
+function openSettings() {
+  $('#token').value = state.token;
+  $('#postcode').value = state.postcode;
+  $('#repo').value = state.repo;
+  $('#settings').showModal();
+}
+$('#settingsBtn').addEventListener('click', openSettings);
+$('#settings').addEventListener('close', () => {
+  if ($('#settings').returnValue !== 'save') return;
+  state.token = $('#token').value.trim();
+  state.postcode = $('#postcode').value.replace(/\D/g, '').slice(0, 4);
+  state.repo = $('#repo').value.trim().replace(/^https:\/\/github\.com\//, '').replace(/\/$/, '');
+  LS.set('token', state.token); LS.set('postcode', state.postcode); LS.set('repo', state.repo);
+  load();
+});
+document.addEventListener('visibilitychange', () => { if (!document.hidden && Object.keys(state.pending).length) poll(); });
+
+load();
+</script>
+</body>
+</html>
