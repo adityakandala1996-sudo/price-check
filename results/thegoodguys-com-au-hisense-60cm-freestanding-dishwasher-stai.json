@@ -1,0 +1,6 @@
+{
+  "item": "https://www.thegoodguys.com.au/hisense-60cm-freestanding-dishwasher-stainless-steel-hsce14fs",
+  "postcode": "3978",
+  "checked_at": "2026-10-26T09:24:39.402Z",
+  "error": "Invalid auth token · Fix external auth token · Invalid Authorization header value from CLAUDE_CODE_OAUTH_TOKEN: it contains a line break at character 80 (110 characters on 2 lines)."
+}
