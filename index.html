@@ -63,7 +63,7 @@ h1 { font-family: var(--display); font-stretch: 125%; font-weight: 800; text-tra
 .hero .meta { color: var(--faint); margin-top: 14px; line-height: 1.9; }
 
 /* Stats */
-.stats { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--line); }
+.stats { display: grid; grid-template-columns: repeat(2, 1fr); border-bottom: 1px solid var(--line); }
 .stat { padding: 14px 16px; min-width: 0; }
 .stat + .stat { border-left: 1px solid var(--line); }
 .stat b { display: block; font-family: var(--display); font-stretch: 112%; font-weight: 700; font-size: 1.35rem; letter-spacing: -.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -228,7 +228,10 @@ p.help { margin: 6px 0 0; font-size: .8rem; color: var(--muted); }
 <script>
 const LS = {
   get(k, d) { try { const v = localStorage.getItem('pc.' + k); return v === null ? d : JSON.parse(v); } catch { return d; } },
-  set(k, v) { try { localStorage.setItem('pc.' + k, JSON.stringify(v)); } catch {} },
+  set(k, v) {
+    try { localStorage.setItem('pc.' + k, JSON.stringify(v)); return true; }
+    catch { return false; }
+  },
 };
 
 function defaultRepo() {
@@ -519,12 +522,10 @@ function renderStats() {
   const box = $('#stats');
   const results = state.wishlist.map((i) => state.results[i.slug]).filter((r) => r && !r.error);
   if (!state.wishlist.length) { box.hidden = true; return; }
-  const total = results.reduce((s, r) => s + (typeof r.best?.total === 'number' ? r.best.total : 0), 0);
   const tokens = results.reduce((s, r) => s + (r.usage?.tokens || 0), 0);
   box.replaceChildren(
     el('div', { class: 'stat' }, el('b', {}, String(state.wishlist.length)), el('span', { class: 'mono' }, state.wishlist.length === 1 ? 'Item' : 'Items')),
-    el('div', { class: 'stat' }, el('b', {}, total ? money(total).replace(/\.\d\d$/, '') : '—'), el('span', { class: 'mono' }, 'Best total')),
-    el('div', { class: 'stat' }, el('b', {}, tokens ? fmtTokens(tokens) : '—'), el('span', { class: 'mono' }, 'Tokens used')));
+    el('div', { class: 'stat' }, el('b', {}, tokens ? fmtTokens(tokens) : '—'), el('span', { class: 'mono' }, 'Total tokens used')));
   box.hidden = false;
 }
 
@@ -582,8 +583,13 @@ $('#settings').addEventListener('close', () => {
   state.token = $('#token').value.trim();
   state.postcode = $('#postcode').value.replace(/\D/g, '').slice(0, 4);
   state.repo = $('#repo').value.trim().replace(/^https:\/\/github\.com\//, '').replace(/\/$/, '');
-  LS.set('token', state.token); LS.set('postcode', state.postcode); LS.set('repo', state.repo);
-  load();
+  const saved = LS.set('token', state.token) && LS.set('postcode', state.postcode) && LS.set('repo', state.repo);
+  // Ask the browser not to clear this page's storage (Safari may otherwise drop it after a week unused).
+  navigator.storage?.persist?.().catch(() => {});
+  load();   // clears old errors synchronously before its first await
+  if (!saved || LS.get('token', '') !== state.token) {
+    showErr('This browser won’t save settings (Private Browsing or blocked website data), so you’ll be asked for the token again next time.');
+  }
 });
 // Tapping the dimmed backdrop closes a sheet.
 for (const d of document.querySelectorAll('dialog')) d.addEventListener('click', (e) => { if (e.target === d) d.close('cancel'); });
