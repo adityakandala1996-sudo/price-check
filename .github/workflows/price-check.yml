@@ -47,12 +47,7 @@ jobs:
         run: |
           # Pasted tokens often pick up the terminal's line wrap; strip all whitespace.
           export CLAUDE_CODE_OAUTH_TOKEN="$(printf '%s' "$RAW_TOKEN" | tr -d '[:space:]')"
-          node scripts/prompt.mjs > prompt.txt
-          claude -p "$(cat prompt.txt)" \
-            --model sonnet \
-            --allowedTools "WebSearch,WebFetch" \
-            --max-turns 60 \
-            --output-format json > out.json || true
+          scripts/run-claude.sh
 
       - name: Save result
         env:
