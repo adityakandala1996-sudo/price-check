@@ -8,7 +8,7 @@ if (!/^[a-z0-9-]{1,80}$/.test(slug)) {
 }
 
 const base = {
-  item: (process.env.ITEM || '').slice(0, 500),
+  item: (process.env.ITEM || '').slice(0, 2000),
   postcode: (process.env.POSTCODE || '').replace(/\D/g, '').slice(0, 4),
   checked_at: new Date().toISOString(),
 };

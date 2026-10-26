@@ -35,7 +35,7 @@ body {
   font: 15px/1.55 "Inter", system-ui, -apple-system, sans-serif;
   -webkit-text-size-adjust: 100%; -webkit-font-smoothing: antialiased;
 }
-button, input { font: inherit; color: inherit; }
+button, input, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; border: 0; background: none; }
 button:disabled { cursor: default; opacity: .55; }
 a { color: inherit; }
@@ -150,8 +150,9 @@ dialog::backdrop { background: rgba(16,16,20,.5); }
 p.help { margin: 6px 0 0; font-size: .8rem; color: var(--muted); }
 .field { margin-top: 18px; }
 .field label { display: block; color: var(--muted); margin-bottom: 6px; }
-.field input { width: 100%; height: 48px; padding: 0 14px; border: 1px solid var(--line); background: var(--raised); outline: none; }
-.field input:focus { border-color: var(--ink); }
+.field input, .field textarea { width: 100%; height: 48px; padding: 0 14px; border: 1px solid var(--line); background: var(--raised); outline: none; }
+.field textarea { height: auto; min-height: 104px; padding: 12px 14px; resize: vertical; line-height: 1.45; }
+.field input:focus, .field textarea:focus { border-color: var(--ink); }
 .actions { display: flex; gap: 10px; margin-top: 22px; }
 .actions button { flex: 1; height: 48px; font-family: var(--mono); font-size: .72rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; }
 .btn-primary { background: var(--ink); color: var(--bg); }
@@ -187,12 +188,13 @@ p.help { margin: 6px 0 0; font-size: .8rem; color: var(--muted); }
     <h2>Add to wishlist</h2>
     <p class="help">Claude searches genuine Australian stores as soon as you add it.</p>
     <div class="field">
-      <label class="mono" for="newName">Name</label>
-      <input id="newName" placeholder="e.g. Sony noise-cancelling headphones" autocomplete="off" maxlength="120" required>
+      <label class="mono" for="newText">Link or product details</label>
+      <textarea id="newText" rows="4" placeholder="Paste a product link, the product title/description from any site, or both" maxlength="4000" required></textarea>
     </div>
     <div class="field">
-      <label class="mono" for="newUrl">Link (optional)</label>
-      <input id="newUrl" type="url" inputmode="url" placeholder="https://…" autocomplete="off" maxlength="1000">
+      <label class="mono" for="newName">Name (optional)</label>
+      <input id="newName" placeholder="Short name, e.g. Sony headphones" autocomplete="off" maxlength="120">
+      <p class="help">Leave blank and it’s named from what you pasted.</p>
     </div>
     <div class="actions">
       <button class="btn-ghost" value="cancel" formnovalidate>Cancel</button>
@@ -319,22 +321,47 @@ async function saveWishlist(mutate, message) {
 const isUrl = (s) => /^https?:\/\//i.test(s || '');
 // Items added before names existed stored the link as the name.
 const itemUrl = (i) => i.url || (isUrl(i.name) ? i.name : '');
+// Pasted text may be a bare link, a description, or a store's share text with a link inside it.
+function parseInput(text) {
+  const m = (text || '').match(/https?:\/\/[^\s<>"']+/i);
+  const url = m ? m[0].replace(/[).,;!?]+$/, '') : '';
+  const rest = m ? text.replace(m[0], ' ') : text || '';
+  const title = (rest.split('\n').map((l) => l.trim()).find((l) => /[a-z]{2}/i.test(l)) || '').replace(/\s+/g, ' ');
+  const desc = rest.replace(/\s+/g, ' ').trim().slice(0, 1500);
+  return { url, desc, title };
+}
+function nameFromUrl(url) {
+  try {
+    const u = new URL(url);
+    const parts = u.pathname.split('/').filter(Boolean);
+    const dp = parts.indexOf('dp');   // Amazon: /Product-Name-Words/dp/B0XXXX
+    const seg = dp > 0 ? parts[dp - 1] : [...parts].reverse().find((p) => /[a-z]{3,}.*-/i.test(p));
+    if (seg) return decodeURIComponent(seg).replace(/\.\w+$/, '').replace(/[-_+]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 70);
+    return u.hostname.replace(/^www\./, '');
+  } catch { return url.slice(0, 70); }
+}
+function nameFromDesc(desc) {
+  const first = desc.split(/(?<=[.!?|])\s|\s[-–|]\s/)[0] || desc;
+  return first.length > 70 ? first.slice(0, 67).replace(/\s+\S*$/, '') + '…' : first;
+}
 const itemName = (i) => {
-  if (!isUrl(i.name)) return i.name;
+  if (i.name && !isUrl(i.name)) return i.name;
   const r = state.results[i.slug];
   if (r?.product) return r.product;
-  try { return new URL(i.name).hostname.replace(/^www\./, ''); } catch { return i.name; }
+  if (i.title || i.desc) return nameFromDesc(i.title || i.desc);
+  return nameFromUrl(itemUrl(i));
 };
 
-async function addItem(name, url) {
-  name = name.trim();
-  url = (url || '').trim();
-  if (!name) return;
-  if (url && !isUrl(url)) throw new Error('The link must start with http:// or https://');
-  let slug = slugify(name);
+async function addItem(text, name) {
+  const { url, desc, title } = parseInput(text);
+  name = (name || '').trim().slice(0, 120);
+  if (!url && !desc) return;
+  const label = name || (title ? nameFromDesc(title) : nameFromUrl(url));
+  let slug = slugify(label);
   const taken = new Set(state.wishlist.map((i) => i.slug));
-  for (let n = 2; taken.has(slug); n++) slug = slugify(name).slice(0, 56) + '-' + n;
-  await saveWishlist((l) => [...l, { slug, name, url: url || undefined, added: new Date().toISOString() }], 'Add ' + slug);
+  for (let n = 2; taken.has(slug); n++) slug = slugify(label).slice(0, 56) + '-' + n;
+  const item = { slug, name: name || undefined, url: url || undefined, desc: desc || undefined, title: title || undefined, added: new Date().toISOString() };
+  await saveWishlist((l) => [...l, item], 'Add ' + slug);
   render();
   search(slug);
 }
@@ -362,7 +389,11 @@ async function search(slug) {
     await gh('/actions/workflows/price-check.yml/dispatches', {
       method: 'POST',
       body: JSON.stringify({ ref: 'main', inputs: {
-        item: isUrl(item.name) ? item.name : [item.name, item.url].filter(Boolean).join(' — '),
+        item: [
+          item.name && !isUrl(item.name) ? 'Name: ' + item.name : '',
+          item.desc ? 'Details: ' + item.desc : '',
+          itemUrl(item) ? 'Link: ' + itemUrl(item) : '',
+        ].filter(Boolean).join('\n').slice(0, 2000),
         slug, postcode: state.postcode || '' } }),
     });
     state.pending[slug] = Date.now();
@@ -563,11 +594,12 @@ async function load() {
 $('#addBtn').addEventListener('click', () => {
   if (!state.token) { openSettings(); return; }
   $('#addForm').reset();
+  setTimeout(() => $('#newText').focus(), 50);
   $('#addSheet').showModal();
 });
 $('#addSheet').addEventListener('close', async () => {
   if ($('#addSheet').returnValue !== 'add') return;
-  try { await addItem($('#newName').value, $('#newUrl').value); showErr(''); }
+  try { await addItem($('#newText').value, $('#newName').value); showErr(''); }
   catch (err) { showErr(err.message); }
 });
 

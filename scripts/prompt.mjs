@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 
 const skill = readFileSync(new URL('../.claude/skills/price-check/SKILL.md', import.meta.url), 'utf8')
   .replace(/^---[\s\S]*?---\s*/, '');
-const item = (process.env.ITEM || '').slice(0, 500);
+const item = (process.env.ITEM || '').slice(0, 2000);
 const postcode = (process.env.POSTCODE || '').replace(/\D/g, '').slice(0, 4);
 const today = new Date().toLocaleDateString('en-AU', { timeZone: 'Australia/Sydney', dateStyle: 'long' });
 
@@ -12,7 +12,8 @@ process.stdout.write(`${skill}
 ---
 
 You are running unattended (no user to ask). Today is ${today}.
-Wishlist item: ${JSON.stringify(item)}
+Wishlist item (pasted by the user — may include a name, product details copied from a store page, and a link; use all of it to identify the exact product):
+${JSON.stringify(item)}
 Delivery postcode: ${postcode || 'not given — use metro delivery pricing and say so in notes'}
 
 If the item is vague, pick the most likely exact model and say so in "assumption".
