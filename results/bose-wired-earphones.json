@@ -1,0 +1,69 @@
+{
+  "item": "Name: Bose Wired Earphones\nDetails: Bose Noise Cancelling Wired Earbuds - in-Ear Headphones, USB-C Connection, Included Carry Case, in-Line Remote and Microphone, Black",
+  "postcode": "78",
+  "checked_at": "2026-10-26T10:15:05.194Z",
+  "product": "Bose Noise Cancelling Wired Earbuds (USB-C, in-line mic/remote, carry case) – Black, SKU 906940-0010",
+  "assumption": "Used the Black variant of the new 2026 Bose USB-C wired ANC earbuds. 'Postcode 78' isn't a valid AU postcode, so delivery is listed as standard or free shipping. Prices are the AU RRP; I found no discounts. I couldn't check Amazon AU, Officeworks, Big W or Kogan, because searches returned no listing",
+  "best": {
+    "retailer": "The Good Guys",
+    "total": 169,
+    "url": "https://www.thegoodguys.com.au/bose-noise-cancelling-wired-earbuds-black-906940-0010",
+    "why": "Every AU retailer I found lists $169 and none is discounted. The Good Guys page shows $169 with an Add to Cart button and price beat. Stock is unconfirmed, and the page may still show a 15 Oct pre-order date. JB Hi-Fi shows 'Not available'. Bose AU is $169.95 and still marked pre-order."
+  },
+  "offers": [
+    {
+      "retailer": "The Good Guys",
+      "price": 169,
+      "delivery": "Unknown (free C&C is typical)",
+      "total": 169,
+      "stock": "Unknown",
+      "url": "https://www.thegoodguys.com.au/bose-noise-cancelling-wired-earbuds-black-906940-0010",
+      "notes": "Page shows $169 and Add to Cart. A search snippet said pre-order with a 15 Oct 2026 release date, which has passed. Stock status not confirmed. Price beat available.",
+      "risky": false,
+      "verified": true
+    },
+    {
+      "retailer": "JB Hi-Fi",
+      "price": 169,
+      "delivery": "Unknown",
+      "total": 169,
+      "stock": "Backorder",
+      "url": "https://www.jbhifi.com.au/products/bose-noise-cancelling-wired-earbuds-black",
+      "notes": "Page shows $169 but availability is 'Not available'. Will price match.",
+      "risky": false,
+      "verified": true
+    },
+    {
+      "retailer": "Bose Australia (official)",
+      "price": 169.95,
+      "delivery": "Free (orders $49+)",
+      "total": 169.95,
+      "stock": "Backorder",
+      "url": "https://www.bose.com.au/p/headphones/NCWEARB-HEADPHONEIN.html",
+      "notes": "The price was read from the Dewdrop Mint colour page, which is marked Preorder. The Black price wasn't shown separately, so it's assumed to be the same. Ships in 2-4 days once available.",
+      "risky": false,
+      "verified": true
+    }
+  ],
+  "tips": [
+    "No retailer is undercutting the others, so price-match isn't needed. JB Hi-Fi, The Good Guys and Harvey Norman will match each other, so buy from whichever has stock.",
+    "Harvey Norman also lists the White variant. I couldn't confirm its Black price or stock.",
+    "Black Friday and Cyber Monday are about a month away. Bose items often drop then, but a new release may not.",
+    "Check ShopBack or Cashrewards for cashback on Bose AU, The Good Guys and JB Hi-Fi before buying.",
+    "The postcode '78' isn't valid in Australia. Re-send a 4-digit postcode to get an exact delivery cost."
+  ],
+  "sources": [
+    "https://www.thegoodguys.com.au/bose-noise-cancelling-wired-earbuds-black-906940-0010",
+    "https://www.jbhifi.com.au/products/bose-noise-cancelling-wired-earbuds-black",
+    "https://www.bose.com.au/p/headphones/NCWEARB-HEADPHONEIN.html",
+    "https://www.harveynorman.com.au/bose-noise-cancelling-wired-earbuds-white.html",
+    "https://manofmany.com/tech/audio/bose-noise-cancelling-wired-earbuds",
+    "https://eftm.com/2026/09/bose-brings-back-wired-noise-cancelling-earbuds-and-were-loving-it-281482"
+  ],
+  "usage": {
+    "tokens": 215570,
+    "cost_usd": 0.14,
+    "turns": 10,
+    "seconds": 35
+  }
+}
